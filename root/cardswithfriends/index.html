@@ -16,46 +16,71 @@
            scales are 250x350 px. */
 
         :root {
-            --card-scale-width: 9;
+            --card-width-px: 250;
+            --card-height-px: 350;
+        }
+        /* This is the layout for landscape. Values are in 'card width multipliers' */
+        :root {
+            --card-scale-width: 10;
             --card-scale-height: 5;
-            --board-area-mult-width: 8;
-            --board-area-mult-height: 4;
-            --hand-top-mult: 2.7;
+            --board-area-mult-width: 9.5;
+            --board-area-mult-height: 4.5;
             --play-top-mult: 1.3;
+            --play-left-mult: 2;
+            --play-area-max-width: 5;
+            --play-area-max-height: 1;
+            --hand-top-mult: 2.7;
+            --hand-left-mult: 0.2;
+            --hand-area-max-width: 7.9;
+            --hand-area-max-height: 1;
+            --deck-left-mult: 8.3;
+            --deck-top-mult: 2.7;
             --modifier-top-mult: 1.2;
         }
+        /* This is the layout for portrait. Values are in 'card width multipliers' */
         @media (orientation: portrait) {
             :root {
                 --card-scale-width: 8;
                 --card-scale-height: 10;
-                --board-area-mult-width: 7;
-                --board-area-mult-height: 9;
+                --board-area-mult-width: 7.5;
+                --board-area-mult-height: 9.5;
                 --hand-top-mult: 5;
                 --play-top-mult: 3;
+                --play-left-mult: 1;
+                --hand-left-mult: 0.5;
                 --modifier-top-mult: 2;
+                --play-area-max-width: 5;
+                --hand-area-max-width: 6;
             }
         }
         :root {
             --hand-size: 1;
-            --play-size: 5;
+            --play-size: 1;
             --card-scale-width-invert: calc( 1 / var(--card-scale-width) );
             --card-scale-height-invert: calc( 1 / var(--card-scale-height) );
             --board-area-width: calc( var(--card-width) * var(--board-area-mult-width) );
             --board-area-height: calc( var(--card-height) * var(--board-area-mult-height) ); 
-            --card-width: calc( min( var(--card-scale-width-invert) * 100dvw, var(--card-scale-height-invert) / 350 * 250 * 100dvh ) );
-            --card-height: calc( var(--card-width) * 350 / 250 );
-            --play-area-width: calc( 5.5 * var(--card-width) );
-            --play-area-card-width: calc( min( 1.1 * var(--card-width), (var(--play-area-width) - var(--card-width)) / ( var(--play-size) - 1 ) ) );
-            --play-area-dynamic-width: calc( var(--card-width) + ( ( var(--play-size) - 1 ) * var(--play-area-card-width) ) );
-            --play-area-dynamic-left: calc( (var(--board-area-width) - var(--play-area-dynamic-width)) / 2 );
-            --play-area-left: calc( (var(--board-area-width) - var(--play-area-width)) / 2 );
+            --card-width: calc( min( var(--card-scale-width-invert) * 100dvw, var(--card-scale-height-invert) / var(--card-height-px) * var(--card-width-px) * 100dvh ) );
+            --max-card-width: calc(1.1 * var(--card-width));
+            --card-height: calc( var(--card-width) * var(--card-height-px) / var(--card-width-px) );
+            --play-area-width: calc( var(--play-area-max-width) * var(--max-card-width) );
+            --play-area-card-width: calc( min( var(--max-card-width), (var(--play-area-width) - var(--card-width)) / ( var(--play-size) - 1 ) ) );
+            --play-area-left: calc( var(--play-left-mult) * var(--card-width) );
             --play-area-top: calc( var(--card-height) * var(--play-top-mult) );
-            --hand-area-width: calc( ( var(--board-area-mult-width) - 2 ) * var(--card-width) );
-            --hand-area-card-width: calc( min( 1.1 * var(--card-width), ( var(--hand-area-width) - var(--card-width) ) / ( var(--hand-size) - 1 ) ) );
-            --hand-area-dynamic-width: calc( var(--card-width) + ( ( var(--hand-size) - 1 ) * var(--hand-area-card-width) ) );
-            --hand-area-dynamic-left: calc( (var(--board-area-width) - var(--hand-area-dynamic-width)) / 2 );
-            --hand-area-left: var(--card-width);
+            --play-area-height: calc( var(--play-area-max-height) * var(--card-height) );
+            --play-area-dynamic-width: calc( var(--card-width) + ( ( var(--play-size) - 1 ) * var(--play-area-card-width) ) );
+            --play-area-dynamic-left: calc( var(--play-area-left) + (var(--play-area-width) - var(--play-area-dynamic-width)) / 2 );
+            --hand-area-left: calc(var(--hand-left-mult) * var(--card-width));
             --hand-area-top: calc( var(--card-height) * var(--hand-top-mult) );
+            --hand-area-height: calc( var(--hand-area-max-height) * var(--card-height) );
+            --hand-area-card-width: calc( min( var(--max-card-width), ( var(--hand-area-width) - var(--card-width) ) / ( var(--hand-size) - 1 ) ) );
+            --hand-area-dynamic-width: calc( var(--card-width) + ( ( var(--hand-size) - 1 ) * var(--hand-area-card-width) ) );
+            --hand-area-width: calc( var(--hand-area-max-width) * var(--card-width) );
+            --hand-area-dynamic-left: calc( var(--hand-area-left) + (var(--hand-area-width) - var(--hand-area-dynamic-width)) / 2 );
+            --deck-area-left: calc( var(--card-width) * var(--deck-left-mult) );
+            --deck-area-top: calc( var(--card-height) * var(--deck-top-mult) );
+            --deck-area-width: calc(var(--card-width));
+            --deck-area-height: calc(var(--card-height));
         }
 
         .vguide { border-left: 1px dashed yellow; position: absolute;
@@ -76,13 +101,19 @@
             left: calc(var(--hand-area-left));
             top: calc(var(--hand-area-top));
             width: calc(var(--hand-area-width));
-            height: calc(var(--card-height));
+            height: calc(var(--hand-area-height));
         }
         .playarea { border: 2px solid, white; border-radius: 10px; position: absolute;
             left: calc(var(--play-area-left));
             top: calc(var(--play-area-top));
             width: calc(var(--play-area-width));
-            height: calc(var(--card-height));
+            height: calc(var(--play-area-height));
+        }
+        .deckarea { border: 2px solid, white; borader-radius: 10px; position: absolute;
+            left: calc(var(--deck-area-left));
+            top: calc(var(--deck-area-top));
+            width: calc(var(--deck-area-width));
+            height: calc(var(--deck-area-height));
         }
         .boardarea { border: 2px solid, white; border-radius: 10px; position: relative; width: var(--board-area-width); min-width: var(--board-area-width); height: var(--board-area-height); min-height: var(--board-area-height); }
 
@@ -300,6 +331,7 @@
     let cardHolderDiv = null;
     let playAreaDiv = null;
     let handAreaDiv = null;
+    let deckAreaDiv = null;
 
     function sortByCardslot( theArray ) {
         theArray.sort( (a,b) => b.getAttribute("cardslot") - a.getAttribute("cardslot") );
@@ -314,7 +346,7 @@
     function xToSlot( mouseX, leftPx, rightPx, numCards ) {
         if( mouseX < leftPx ) return 1;
         if( mouseX > rightPx ) return numCards;
-        return Math.min( 1 + Math.ceil( (mouseX - leftPx) / (rightPx - leftPx) * numCards ), numCards );
+        return Math.min( 1 + Math.ceil( ((mouseX - leftPx) / (rightPx - leftPx)) * numCards ), numCards );
     }
 
     function xToPlaySlot( mouseX ) {
@@ -371,7 +403,7 @@
         pxHandRight = rect.right;
     }
 
-    <!-- Generics on mouse up/move so when we stop dragging or drag off items we actually get the events -->
+    //Generics on mouse up/move so when we stop dragging or drag off items we actually get the events
     window.onmouseup = function(event) {
         preventStuff(event); 
         if( dragonDiv ) {
@@ -449,8 +481,11 @@
         handAreaDiv.classList.add("handarea");
         playAreaDiv = document.createElement("div");
         playAreaDiv.classList.add("playarea");
+        deckAreaDiv = document.createElement("div");
+        deckAreaDiv.classList.add("deckarea");
         cardHolderDiv.appendChild( handAreaDiv );
         cardHolderDiv.appendChild( playAreaDiv );
+        cardHolderDiv.appendChild( deckAreaDiv );
         
         return cardHolderDiv;
     }
@@ -476,15 +511,17 @@
         setTimeout(fetchUIDimensions, 1000);
         theBody.appendChild( holderDiv );
         let i = 0;
-        let j = 0;
-        for( j = 0; j < 4; ++j ) {
-            for( i = 0; i < 12; ++i ) {
-                console.log("Adding: " + i + ":" + j);
-                let cardDiv = newCardDiv( theText[i], i+1, theSuits[j] );
-                moveInHand( cardDiv, i + (j*13) );
-                cardDiv.classList.add("animpos");
-                holderDiv.appendChild( cardDiv );
-            }
+        for( i = 0; i < 8; ++i ) {
+            let cardDiv = newCardDiv( theText[i], i+1, theSuits[0] );
+            moveInHand( cardDiv, i + 1 );
+            cardDiv.classList.add("animpos");
+            holderDiv.appendChild( cardDiv );
+        }
+        for( i = 0; i < 5; ++i ) {
+            let cardDiv = newCardDiv( theText[i], i+1, theSuits[1] );
+            moveInPlay( cardDiv, i + 1 );
+            cardDiv.classList.add("animpos");
+            holderDiv.appendChild( cardDiv );
         }
         
     };
