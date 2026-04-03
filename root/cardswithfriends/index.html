@@ -324,6 +324,7 @@
     let pxPlayTop = 0;
     let pxPlayLeft = 0;
     let pxPlayRight = 0;
+    let pxHolderLeft = 0;
 
     let cardsInPlay = [];
     let cardsInHand = [];
@@ -343,10 +344,13 @@
         }
     }
 
-    function xToSlot( mouseX, leftPx, rightPx, numCards ) {
-        if( mouseX < leftPx ) return 1;
-        if( mouseX > rightPx ) return numCards;
-        return Math.min( 1 + Math.ceil( ((mouseX - leftPx) / (rightPx - leftPx)) * numCards ), numCards );
+    function xToSlot( inX, leftPx, rightPx, numCards ) {
+        let mouseX = inX + pxHolderLeft;
+        let slotCardWidth = (rightPx - leftPx - pxCardWidth) / numCards;
+        let xDist = mouseX - leftPx;
+        if( mouseX <= leftPx ) return 1;
+        if( mouseX > rightPx - pxCardWidth ) return numCards;
+        return Math.min( Math.ceil( xDist / slotCardWidth ), numCards );
     }
 
     function xToPlaySlot( mouseX ) {
@@ -360,6 +364,7 @@
     }
 
     function genericMove( cardDiv, destSlot, maybeSource, sourceClass, sourceProperty, maybeDest, destClass, destProperty ) {
+        console.log("Dest Slot: " + destSlot );
         let removeIdx = maybeSource.indexOf( cardDiv );
         let oldSlot = cardDiv.getAttribute("cardslot");
         if( removeIdx != -1 ) {
@@ -392,8 +397,8 @@
     }
 
     function fetchUIDimensions() {
+        console.log("FetchUI");
         let rect = playAreaDiv.getBoundingClientRect();
-        pxCardHeight = rect.height;
         pxPlayTop = rect.top;
         pxPlayLeft = rect.left;
         pxPlayRight = rect.right;
@@ -401,6 +406,11 @@
         pxHandTop = rect.top;
         pxHandLeft = rect.left;
         pxHandRight = rect.right;
+        rect = deckAreaDiv.getBoundingClientRect();
+        pxCardHeight = rect.height;
+        pxCardWidth = rect.width;
+        rect = cardHolderDiv.getBoundingClientRect();
+        pxHolderLeft = rect.left;
     }
 
     //Generics on mouse up/move so when we stop dragging or drag off items we actually get the events
@@ -427,15 +437,17 @@
             //pxHandTop and pxCardTop
 
             if( dragonDiv.currTop != newTop || dragonDiv.currLeft != newLeft ) {
-                dragonDiv.style.zIndex = 1024;
+                //dragonDiv.style.zIndex = 1024;
                 dragonDiv.style.top = newTop;
                 dragonDiv.style.left = newLeft;
                 dragonDiv.currTop = newTop;
                 dragonDiv.currLeft = newLeft;
                 if( mouseY > pxHandTop && mouseY < (pxHandTop + pxCardHeight) ) {
+                    console.log( "XY: " + mouseX + " " + mouseY );
                     moveInHand( dragonDiv, xToHandSlot(mouseX) );
                 }
                 if( mouseY > pxPlayTop && mouseY < (pxPlayTop + pxCardHeight) ) {
+                    console.log( "XY: " + mouseX + " " + mouseY );
                     moveInPlay( dragonDiv, xToPlaySlot(mouseX) );
                 }
             }
