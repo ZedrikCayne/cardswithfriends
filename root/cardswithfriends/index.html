@@ -4,6 +4,7 @@
     <!-- Copyright 2026 by Zedrik Cayne -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="HandheldFriendly" content="true"></meta>
     <title>Cards With Friends</title>
     <style>
         body { background: #2c3e50; display: flex; content: center; gap: 0px; padding: 0px; justify-content: center; font-family: sans-serif; overflow: hidden; }
@@ -50,7 +51,9 @@
                 --hand-left-mult: 0.5;
                 --modifier-top-mult: 2;
                 --play-area-max-width: 5;
-                --hand-area-max-width: 6;
+                --hand-area-max-width: 6.5;
+                --deck-top-mult: 7;
+                --deck-left-mult: 2;
             }
         }
         :root {
@@ -118,9 +121,12 @@
         .boardarea { border: 2px solid, white; border-radius: 10px; position: relative; width: var(--board-area-width); min-width: var(--board-area-width); height: var(--board-area-height); min-height: var(--board-area-height); }
 
         .card { width: calc( var(--card-width) ); height: calc( var(--card-height) ); filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); transition: transform 0.2s; }
-        .card:hover { transform: translateY(calc(var(--card-height) * -0.05)) ; }
         .animpos { transition: left 0.2s, top 0.2s; }
         .negative { filter: invert(90%) drop-shadow(0 5px  15px rgba(0,0,0,0.3)); }
+
+        @media (hover: hover) {
+            .card:hover { transform: translateY(calc(var(--card-height) * -0.05)) ; }
+        }
 
         .play {
             position: absolute;
@@ -315,7 +321,7 @@
     let dragonDiv = null;
     let dragonDivOffsetX = 0;
     let dragonDivOffsetY = 0;
-    let dragonTouch = 0;
+    let dragonTouch = -1;
 
     let pxCardWidth = 0;
     let pxCardHeight = 0;
@@ -419,7 +425,7 @@
             dragonDiv.style = "";
             dragonDiv.classList.add("animpos");
         }
-        dragonTouch = 0;
+        dragonTouch = -1;
         dragonDiv = null;
     };
 
@@ -432,12 +438,14 @@
                 break;
             }
         }
+        if( !myTouch ) return true;
         if( myTouch && dragonDiv ) {
             dragonDiv.style = "";
             dragonDiv.classList.add("animpos");
         }
-        dragonTouch = 0;
+        dragonTouch = -1;
         dragonDiv = null;
+        return true;
     }
 
     window.onmousemove = function(event) {
@@ -521,7 +529,7 @@
     function cardMouseDown(event) {
         preventStuff(event);
         let maybeDiv = getCardDiv(event.target);
-        if( maybeDiv === dragonDiv ) return true;
+        if( dragonDiv !== null ) return true;
         dragonDiv = maybeDiv;
         dragonDivOffsetX = event.offsetX;
         dragonDivOffsetY = event.offsetY;
@@ -530,15 +538,16 @@
     }
 
     function cardTouchStart(event) {
-        preventStuff(event);
+        //preventStuff(event);
         let maybeDiv = getCardDiv(event.target);
         if( maybeDiv === null || maybeDiv === undefined ) return true;
-        if( maybeDiv === dragonDiv ) return true;
-        if( dragonTouch !== 0 ) return true;
+        if( dragonDiv !== null ) return true;
+        if( dragonTouch !== -1 ) return true;
         dragonDiv = maybeDiv;
         dragonDivOffsetX = pxCardWidth / 2;
-        dragonDivOffsetY = pxCardHeight / 2;
+        dragonDivOffsetY = pxCardHeight * 5 / 6;
         for( aTouch of event.changedTouches ) {
+            console.log(aTouch.identifier);
             dragonTouch = aTouch.identifier;
             break;
         }
