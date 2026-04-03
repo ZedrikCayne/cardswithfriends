@@ -4,7 +4,7 @@
     <!-- Copyright 2026 by Zedrik Cayne -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>52 Card Deck</title>
+    <title>Cards With Friends</title>
     <style>
         body { background: #2c3e50; display: flex; content: center; gap: 0px; padding: 0px; justify-content: center; font-family: sans-serif; overflow: hidden; }
         svg { width: 100%; height: 100%; }
@@ -315,6 +315,7 @@
     let dragonDiv = null;
     let dragonDivOffsetX = 0;
     let dragonDivOffsetY = 0;
+    let dragonTouch = 0;
 
     let pxCardWidth = 0;
     let pxCardHeight = 0;
@@ -418,8 +419,26 @@
             dragonDiv.style = "";
             dragonDiv.classList.add("animpos");
         }
+        dragonTouch = 0;
         dragonDiv = null;
     };
+
+    window.ontouchend = function(event) {
+        //preventStuff(event);
+        let myTouch = false;
+        for( aTouch of event.changedTouches ) {
+            if( aTouch.identifier == dragonTouch ) {
+                myTouch = true;
+                break;
+            }
+        }
+        if( myTouch && dragonDiv ) {
+            dragonDiv.style = "";
+            dragonDiv.classList.add("animpos");
+        }
+        dragonTouch = 0;
+        dragonDiv = null;
+    }
 
     window.onmousemove = function(event) {
         preventStuff(event);
@@ -447,6 +466,47 @@
         return true;
     };
 
+    window.ontouchmove = function(event) {
+        //preventStuff(event);
+        if( dragonDiv ) {
+            let rect = dragonDiv.parentElement.getBoundingClientRect();
+
+            let mouseY = 0
+            let mouseX = 0
+            let myTouch = false;
+
+            for( aTouch of event.changedTouches ) {
+                if( aTouch.identifier == dragonTouch ) {
+                    myTouch = true;
+                    mouseY = aTouch.clientY - rect.top;
+                    mouseX = aTouch.clientX - rect.left;
+                    break;
+                }
+            }
+
+            if( !myTouch ) {
+                return true;
+            }
+            
+            let newTop = mouseY - dragonDivOffsetY + "px";
+            let newLeft = mouseX - dragonDivOffsetX + "px";
+
+            
+            if( dragonDiv.currTop != newTop || dragonDiv.currLeft != newLeft ) {
+                dragonDiv.style.top = newTop;
+                dragonDiv.style.left = newLeft;
+                dragonDiv.currTop = newTop;
+                dragonDiv.currLeft = newLeft;
+                if( mouseY > pxHandTop && mouseY < (pxHandTop + pxCardHeight) ) {
+                    moveInHand( dragonDiv, xToHandSlot(mouseX) );
+                }
+                if( mouseY > pxPlayTop && mouseY < (pxPlayTop + pxCardHeight) ) {
+                    moveInPlay( dragonDiv, xToPlaySlot(mouseX) );
+                }
+            }
+        }
+        return true;
+    }
 
     window.onresize = function(event) {
         fetchUIDimensions();
@@ -469,11 +529,30 @@
         return true;
     }
 
+    function cardTouchStart(event) {
+        preventStuff(event);
+        let maybeDiv = getCardDiv(event.target);
+        if( maybeDiv === null || maybeDiv === undefined ) return true;
+        if( maybeDiv === dragonDiv ) return true;
+        if( dragonTouch !== 0 ) return true;
+        dragonDiv = maybeDiv;
+        dragonDivOffsetX = pxCardWidth / 2;
+        dragonDivOffsetY = pxCardHeight / 2;
+        for( aTouch of event.changedTouches ) {
+            dragonTouch = aTouch.identifier;
+            break;
+        }
+        dragonDiv.classList.remove("animpos");
+    }
+
     function newCardDiv(text,pips,suit) {
         const theDiv = document.createElement("div");
+        const options = {};
+        options.passive = true;
         theDiv.classList.add("card");
         theDiv.appendChild(newCard(text,pips,suit));
-        theDiv.onmousedown = cardMouseDown;
+        theDiv.addEventListener("mousedown",cardMouseDown);
+        theDiv.addEventListener("touchstart",cardTouchStart);
         theDiv.isCard = true;
         return theDiv;
     }
