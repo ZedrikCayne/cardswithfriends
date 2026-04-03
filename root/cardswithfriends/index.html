@@ -364,7 +364,6 @@
     }
 
     function genericMove( cardDiv, destSlot, maybeSource, sourceClass, sourceProperty, maybeDest, destClass, destProperty ) {
-        console.log("Dest Slot: " + destSlot );
         let removeIdx = maybeSource.indexOf( cardDiv );
         let oldSlot = cardDiv.getAttribute("cardslot");
         if( removeIdx != -1 ) {
@@ -397,7 +396,6 @@
     }
 
     function fetchUIDimensions() {
-        console.log("FetchUI");
         let rect = playAreaDiv.getBoundingClientRect();
         pxPlayTop = rect.top;
         pxPlayLeft = rect.left;
@@ -433,21 +431,15 @@
             let newTop = mouseY - dragonDivOffsetY + "px";
             let newLeft = mouseX - dragonDivOffsetX + "px";
             
-            //top and left are in the pixels in the card holder rect which match the px values
-            //pxHandTop and pxCardTop
-
             if( dragonDiv.currTop != newTop || dragonDiv.currLeft != newLeft ) {
-                //dragonDiv.style.zIndex = 1024;
                 dragonDiv.style.top = newTop;
                 dragonDiv.style.left = newLeft;
                 dragonDiv.currTop = newTop;
                 dragonDiv.currLeft = newLeft;
                 if( mouseY > pxHandTop && mouseY < (pxHandTop + pxCardHeight) ) {
-                    console.log( "XY: " + mouseX + " " + mouseY );
                     moveInHand( dragonDiv, xToHandSlot(mouseX) );
                 }
                 if( mouseY > pxPlayTop && mouseY < (pxPlayTop + pxCardHeight) ) {
-                    console.log( "XY: " + mouseX + " " + mouseY );
                     moveInPlay( dragonDiv, xToPlaySlot(mouseX) );
                 }
             }
